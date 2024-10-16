@@ -42,10 +42,10 @@ Result write_wrapper(WriteResult* result, int file_descriptor, void* buffer, siz
             : errno == EPIPE ? PIPE_IS_CLOSED
             : UNRECOGNIZED_ERROR
         ;
-        return SUCCESS;
+        return ERROR;
     }
     result->success.bytes_amount = raw_result;
-    return ERROR;
+    return SUCCESS;
 }
 
 #define small_string(name, literal) char name[sizeof(literal) - 1] = literal;
@@ -53,10 +53,10 @@ int main(void) {
     WriteResult write_result;
     small_string(hello, "hello\n");
     if (write_wrapper(&write_result, STDOUT_FILENO, hello, sizeof(hello))) {
-        fprintf(stderr, "Error with code %i was received\n", write_result.error);
-        return 1;
-    } else {
         fprintf(stdout, "%lu bytes were written\n", write_result.success.bytes_amount);
         return 0;
+    } else {
+        fprintf(stderr, "Error with code %i was received\n", write_result.error);
+        return 1;
     }
 }
